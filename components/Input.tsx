@@ -2,12 +2,18 @@
 import React from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
-export default function Input() {
+interface InputProps {
+  defaultValue?: string;
+}
+
+export default function Input({ defaultValue }: InputProps) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
+
   function handleSearch(term: string) {
     const params = new URLSearchParams(searchParams);
+
     if (term) {
       params.set("query", term);
     } else {
@@ -15,6 +21,7 @@ export default function Input() {
     }
     replace(`${pathname}?${params.toString()}`);
   }
+
   return (
     <div>
       <input
@@ -25,7 +32,7 @@ export default function Input() {
         onChange={(e) => {
           handleSearch(e.target.value);
         }}
-        defaultValue={searchParams.get("query")?.toString()}
+        defaultValue={defaultValue || searchParams.get("query")?.toString()}
       />
     </div>
   );

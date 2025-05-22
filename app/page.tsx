@@ -1,9 +1,9 @@
 import getApi from "@/utils/constant";
 import Input from "@/components/Input";
+import Pagination from "@/components/Pagination";
 
 async function getDragons() {
   const { method, url } = getApi("getDragons");
-
   const res = await fetch(url, { method });
   if (!res.ok) throw new Error("Failed to fetch spells");
   const data = await res.json();
@@ -13,14 +13,20 @@ async function getDragons() {
 export default async function Home({
   searchParams,
 }: {
-  searchParams?: { query?: string };
+  searchParams: { query?: string; page?: string };
 }) {
+  const currentPage = Number(searchParams?.page) || 1;
   const query = searchParams?.query?.toLowerCase() || "";
   const spellsData = await getDragons();
 
   const filteredSpells = spellsData.results.filter((spell: any) =>
     spell.name.toLowerCase().includes(query)
   );
+  const postPerpage = 8;
+  const lastIndex = currentPage * postPerpage;
+  const firstIndex = lastIndex - postPerpage;
+
+  const currentData = filteredSpells.slice(firstIndex, lastIndex);
 
   return (
     <div className="p-4">
@@ -37,7 +43,7 @@ export default async function Home({
       </form>
 
       <ul className="grid grid-cols-4 gap-4 list-none p-0">
-        {filteredSpells.map((spell: any) => (
+        {currentData.map((spell: any) => (
           <li
             key={spell.id || spell.name}
             className="bg-gray-100 rounded-md p-3 shadow text-center flex flex-col items-center"
@@ -49,6 +55,7 @@ export default async function Home({
           </li>
         ))}
       </ul>
+      <Pagination currentPage={currentPage} query={query} />
     </div>
   );
 }
