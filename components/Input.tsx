@@ -2,11 +2,7 @@
 import React from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 
-interface InputProps {
-  defaultValue?: string;
-}
-
-export default function Input({ defaultValue }: InputProps) {
+export default function Input({ defaultValue }) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
@@ -23,7 +19,7 @@ export default function Input({ defaultValue }: InputProps) {
   }
 
   return (
-    <div>
+    <div className="flex gap-4">
       <input
         type="text"
         placeholder="Search..."

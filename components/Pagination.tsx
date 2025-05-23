@@ -1,37 +1,75 @@
 "use client";
-
-import React from "react";
-import { ArrowLeftCircle, ArrowRightCircle } from "lucide-react";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
+import React from "react";
 
-export default function Pagination({ currentPage, query }) {
-  const router = useRouter();
+const Pagination = ({ totalPages }: { totalPages: number }) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { replace } = useRouter();
 
-  const handlePageChange = (page: number) => {
+  const currentPage = Number(searchParams.get("page")) || 1;
+
+  const handlePageChange = (newPage) => {
     const params = new URLSearchParams(searchParams);
-    params.set("page", page.toString());
-    if (query) params.set("query", query);
-    router.push(`${pathname}?${params.toString()}`);
+    params.set("page", newPage.toString());
+    replace(`${pathname}?${params.toString()}`);
   };
+  const isFirstDisabled = currentPage == 1;
+  const isPreviousDisabled = currentPage <= 1;
+  const isNextDisabled = currentPage >= totalPages;
 
   return (
-    <div className="flex justify-center gap-2 mt-4">
-      <button
-        onClick={() => handlePageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-        className="px-3 py-1 rounded bg-gray-200 disabled:opacity-50"
-      >
-        Previous
-      </button>
-      <span className="px-3 py-1">Page {currentPage}</span>
-      <button
-        onClick={() => handlePageChange(currentPage + 1)}
-        className="px-3 py-1 rounded bg-gray-200"
-      >
-        Next
-      </button>
+    <div className="mt-4">
+      <div className="flex gap-4 ml-100">
+        <button
+          onClick={() => {
+            handlePageChange(1);
+          }}
+          disabled={isFirstDisabled}
+          className={`px-4 py-2 rounded-sm ${
+            isFirstDisabled
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-black text-white hover:bg-gray-800"
+          }`}
+        >
+          get to first
+        </button>
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={isPreviousDisabled}
+          className={`px-4 py-2 rounded-sm ${
+            isPreviousDisabled
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-black text-white hover:bg-gray-800"
+          }`}
+        >
+          previous page
+        </button>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={isNextDisabled}
+          className={`px-4 py-2 rounded-sm ${
+            isNextDisabled
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-black text-white hover:bg-gray-800"
+          }`}
+        >
+          next page
+        </button>
+        <button
+          onClick={() => handlePageChange(totalPages)}
+          disabled={isNextDisabled}
+          className={`px-4 py-2 rounded-sm ${
+            isNextDisabled
+              ? "bg-gray-300 cursor-not-allowed"
+              : "bg-black text-white hover:bg-gray-800"
+          }`}
+        >
+          skip to last
+        </button>
+      </div>
     </div>
   );
-}
+};
+
+export default Pagination;
